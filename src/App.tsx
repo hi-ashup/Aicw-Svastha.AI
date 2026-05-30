@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { jsPDF } from 'jspdf';
+import { Analytics } from '@vercel/analytics/react';
 import { 
   Activity, 
   ChevronRight, 
@@ -5313,6 +5314,7 @@ export default function App() {
         onClose={() => setIsAssessmentOpen(false)} 
         onComplete={handleAssessmentComplete}
       />
+      <Analytics />
     </div>
   );
 }
