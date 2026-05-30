@@ -1,5 +1,5 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/hi-ashup/Aicw-Svastha.AI/blob/main/public/assets/Svastha.Ai-GUI.jpg" />
+<img width="1200" height="475" alt="GHBanner" src="![GHBanner](https://raw.githubusercontent.com/hi-ashup/Aicw-Svastha.AI/main/public/assets/Svastha.Ai-GUI.jpg)" />
 </div>
 
 # Svastha.AI – Recalibrate your biological footprint
