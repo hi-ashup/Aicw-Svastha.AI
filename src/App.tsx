@@ -77,7 +77,7 @@ import { AssessmentData, BioState, NutritionPlan, FoodDetail } from './types';
 import Logo from './components/Logo';
 import { WeatherTelemetryModule } from './components/WeatherTelemetryModule';
 import { FoodScannerView } from './components/FoodScannerView';
-import { analyzeBioState, explainFoodItem, classifyFoodItem, FoodExplanation, processConversationalInput } from './services/geminiService';
+import { analyzeBioState, explainFoodItem, classifyFoodItem, FoodExplanation, processConversationalInput, generateDoshaDialogue, generateHealthSummary } from './services/geminiService';
 import { AYURVEDIC_DOSHA_GUIDE, TCM_FOODS_MATRIX, TCM_BALANCE_SCENARIOS } from './constants';
 // Internal SvasthaSlice component
 
@@ -4933,7 +4933,12 @@ export default function App() {
       setLastAssessment(data);
       setView('dashboard');
 
-      speak(`Analysis synchronized. Your primary biological state is identified as ${result.bioState.primary}. I have architected a corrective nutrition matrix focusing on ${result.nutritionPlan.recommendations.slice(0, 2).join(' and ')}.`);
+      // Generate comprehensive dosha-specific dialogue for TTS
+      const healthSummary = generateHealthSummary(result.bioState);
+      const doshaDialogue = generateDoshaDialogue(result.bioState, data);
+      
+      // Announce analysis with personalized guidance
+      speak(`${healthSummary} ${doshaDialogue}`);
     } catch (error) {
       console.error(error);
     } finally {

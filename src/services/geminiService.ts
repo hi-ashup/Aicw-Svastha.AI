@@ -217,3 +217,69 @@ export async function processConversationalInput(transcript: string): Promise<As
     throw error;
   }
 }
+
+/**
+ * Generates contextual, dosha-specific TTS dialogue for diagnosis results
+ * Provides personalized wellness guidance based on Ayurvedic constitution
+ */
+export function generateDoshaDialogue(bioState: BioState, assessmentData: AssessmentData): string {
+  const { primary, secondary, description, scores } = bioState;
+  const { energy, stress, digestion } = assessmentData;
+
+  // Dosha-specific guidance templates
+  const doshaGuidance: Record<string, { intro: string; characteristics: string; recommendations: string }> = {
+    Vata: {
+      intro: "Your dominant constitution is Vata.",
+      characteristics: energy < 40 
+        ? "I'm detecting significant energy depletion with irregular patterns. Your nervous system needs grounding."
+        : stress > 70
+        ? "You're experiencing elevated mental activity and anxiety. Your mind is moving faster than your body can follow."
+        : "You show the airy, creative, and dynamic qualities of Vata. Your system is mobile and responsive.",
+      recommendations: "For balance, prioritize warm foods, consistent routines, and calming practices like gentle yoga or meditation. Avoid cold drinks and excessive stimulation. Regular oil massage will help ground your energy."
+    },
+    Pitta: {
+      intro: "Your dominant constitution is Pitta.",
+      characteristics: stress > 70
+        ? "Your internal fire is high, which is intensifying mental and emotional reactivity."
+        : energy > 75
+        ? "Your metabolism is strong and your drive is high. Channel this heat productively."
+        : "You embody the transformative fire element. Your digestion is typically strong, but you may run hot.",
+      recommendations: "To cool and balance, favor cooling foods like coconut, cucumber, and leafy greens. Practice cooling breathwork. Reduce spicy and fried foods. Swimming or water-based activities will help temper your internal fire."
+    },
+    Kapha: {
+      intro: "Your dominant constitution is Kapha.",
+      characteristics: energy < 40
+        ? "You're experiencing sluggishness and heaviness. Your system needs activation and movement."
+        : digestion.toLowerCase().includes("slow")
+        ? "Your digestion is slow, which is typical for Kapha. Stimulating foods and movement will help."
+        : "You have the grounded, stable qualities of Kapha. Your system is naturally calm and resilient.",
+      recommendations: "To energize and mobilize, emphasize warming, light, and stimulating foods. Increase physical activity, especially vigorous exercise. Dry brushing and morning movement will awaken your system. Reduce heavy, oily, and sweet foods."
+    }
+  };
+
+  const guide = doshaGuidance[primary] || doshaGuidance.Vata;
+  
+  // Build the full dialogue
+  const dialogue = `
+    ${guide.intro} ${guide.characteristics}
+    
+    ${description}
+    
+    ${guide.recommendations}
+  `.trim().replace(/\s+/g, ' ');
+
+  return dialogue;
+}
+
+/**
+ * Generates a quick health summary for voice delivery
+ */
+export function generateHealthSummary(bioState: BioState): string {
+  const { primary, secondary, scores, balance } = bioState;
+  
+  return `Your bio-state analysis is complete. 
+  Primary dosha: ${primary} at ${scores[primary.toLowerCase() as keyof typeof scores]}%. 
+  Secondary influence: ${secondary} at ${scores[secondary.toLowerCase() as keyof typeof scores]}%. 
+  Overall harmony level: ${balance}%. 
+  Proceeding with personalized nutrition plan.`.replace(/\s+/g, ' ');
+}
