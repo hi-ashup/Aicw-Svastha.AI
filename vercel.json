@@ -3,7 +3,6 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": "vite",
-  "nodeVersion": "24.x",
   "env": {
     "VITE_GEMINI_API_KEY": {
       "description": "Google Gemini API Key for AI inference",
