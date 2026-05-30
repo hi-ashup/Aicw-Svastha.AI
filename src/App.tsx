@@ -4431,7 +4431,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !db) {
       setGender('');
       setAgeCategory('');
       return;
@@ -4474,6 +4474,10 @@ export default function App() {
 
   useEffect(() => {
     const testConnection = async () => {
+      if (!db) {
+        console.info('Firebase not configured. Skipping connection test.');
+        return;
+      }
       try {
         await getDocFromServer(doc(db, 'test', 'connection'));
         console.log('Firestore connection verified');
@@ -4496,7 +4500,7 @@ export default function App() {
   // --- Local Data Cache Fallback & Synchronization ---
 
   useEffect(() => {
-    if (!user || view !== 'dashboard') {
+    if (!user || view !== 'dashboard' || !db) {
       if (!user) {
         setBioState(null);
         setNutritionPlan(null);
@@ -4906,25 +4910,29 @@ export default function App() {
       // Save locally first
       localStorage.setItem('svastha_latest_assessment', JSON.stringify(sessionPayload));
       
-      // Try DB persist
-      try {
-        const assessmentRef = doc(collection(db, `users/${user.uid}/assessments`));
-        await setDoc(assessmentRef, {
-          assessmentData: data,
-          bioState: result.bioState,
-          nutritionPlan: result.nutritionPlan,
-          timestamp: Timestamp.now()
-        });
+      // Try DB persist (only if Firebase configured)
+      if (db) {
+        try {
+          const assessmentRef = doc(collection(db, `users/${user.uid}/assessments`));
+          await setDoc(assessmentRef, {
+            assessmentData: data,
+            bioState: result.bioState,
+            nutritionPlan: result.nutritionPlan,
+            timestamp: Timestamp.now()
+          });
 
-        // Update user profile with custom biodata
-        await setDoc(doc(db, 'users', user.uid), {
-          displayName: user.displayName,
-          gender,
-          ageCategory,
-          lastAssessment: Timestamp.now()
-        }, { merge: true });
-      } catch (firestoreErr) {
-        console.warn("Firestore assessment persist skipped/failed (using local state):", firestoreErr);
+          // Update user profile with custom biodata
+          await setDoc(doc(db, 'users', user.uid), {
+            displayName: user.displayName,
+            gender,
+            ageCategory,
+            lastAssessment: Timestamp.now()
+          }, { merge: true });
+        } catch (firestoreErr) {
+          console.warn("Firestore assessment persist skipped/failed (using local state):", firestoreErr);
+        }
+      } else {
+        console.info("Firebase not configured. Assessment saved locally only.");
       }
 
       // Update app state
@@ -4978,15 +4986,20 @@ export default function App() {
               };
               setUser(localUser);
               
-              try {
-                await setDoc(doc(db, 'users', uid), {
-                  displayName: name,
-                  gender: gnd,
-                  ageCategory: age,
-                  lastAssessment: Timestamp.now()
-                }, { merge: true });
-              } catch (firestoreErr) {
-                console.warn("Firestore user creation skipped/failed:", firestoreErr);
+              // Try to sync to Firebase if available
+              if (db) {
+                try {
+                  await setDoc(doc(db, 'users', uid), {
+                    displayName: name,
+                    gender: gnd,
+                    ageCategory: age,
+                    lastAssessment: Timestamp.now()
+                  }, { merge: true });
+                } catch (firestoreErr) {
+                  console.warn("Firestore user creation skipped/failed:", firestoreErr);
+                }
+              } else {
+                console.info("Firebase not configured. Using local storage only.");
               }
               
               setView('welcome');
