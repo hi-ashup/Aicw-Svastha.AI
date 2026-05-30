@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --color-samsung-blue: #0077ff;
+  --color-samsung-green: #2ecc71;
+  --color-samsung-bg: #f8f9fa;
+  --color-samsung-card: #ffffff;
+  --color-samsung-text: #212529;
+  --color-samsung-muted: #6c757d;
+  
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-samsung-bg text-samsung-text font-sans antialiased;
+  }
+
+  /* Improved focus visibility for keyboard navigation */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-blue-600;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-300;
+  }
+}

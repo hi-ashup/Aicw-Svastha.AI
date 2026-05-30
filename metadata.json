@@ -1,0 +1,11 @@
+{
+  "name": "AICW- Svastha",
+  "description": "Contextual Nutrition Edge Application leveraging Ayurveda and TCM for hyper-personalized dietary recovery, featuring a Samsung Health-inspired UI.",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
