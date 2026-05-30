@@ -1,7 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
 import { AssessmentData, BioState, NutritionPlan } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || "";
+
+if (!apiKey) {
+  console.warn("⚠️  GEMINI_API_KEY is not configured. Bio-analysis features will not work. Set VITE_GEMINI_API_KEY in your environment.");
+}
+
+const ai = new GoogleGenAI({ apiKey });
 
 export async function analyzeBioState(data: AssessmentData): Promise<{ bioState: BioState; nutritionPlan: NutritionPlan }> {
   const prompt = `

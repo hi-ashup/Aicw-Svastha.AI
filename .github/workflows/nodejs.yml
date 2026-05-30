@@ -12,12 +12,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [18.x, 20.x, 24.x]
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v5
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
@@ -30,6 +31,17 @@ jobs:
 
       - name: Run build
         run: npm run build
+        env:
+          # Provide dummy Firebase config for build-time (will be overridden in deployment)
+          VITE_FIREBASE_PROJECT_ID: ""
+          VITE_FIREBASE_API_KEY: ""
+          VITE_FIREBASE_AUTH_DOMAIN: ""
+          VITE_FIREBASE_DATABASE_URL: ""
+          VITE_FIREBASE_STORAGE_BUCKET: ""
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ""
+          VITE_FIREBASE_APP_ID: ""
+          VITE_FIRESTORE_DATABASE_ID: "(default)"
+          VITE_GEMINI_API_KEY: ""
 
       - name: List production files
         run: |
